@@ -1,58 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video & Audio Recorder</title>
+    <title>Video & Audio Recorder - CommunAi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0cffe1;
+            --secondary: #2c6ffc;
+            --dark: #0a0a14;
+            --darker: #050508;
+            --text: #e0e0f0;
+            --text-muted: #a8a8c0;
+            --glow: rgba(12, 255, 225, 0.6);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(5, 5, 8, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            text-shadow: 0 0 10px var(--glow);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--text);
+        }
+        
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+        
+        .recorder-card {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(10, 10, 20, 0.7);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(44, 111, 252, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .recorder-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .recorder-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .recorder-title span {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--glow);
+        }
+        
+        video {
+            width: 100%;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            box-shadow: 0 0 15px var(--glow);
+        }
+        
+        .control-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--darker);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .control-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px var(--glow);
+        }
+        
+        .control-btn:disabled {
+            background: linear-gradient(45deg, #666, #888);
+            color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .control-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        
+        .section-divider {
+            position: relative;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: var(--text-muted);
+            opacity: 0.3;
+        }
+        
+        .section-divider::before {
+            left: 0;
+        }
+        
+        .section-divider::after {
+            right: 0;
+        }
+        
+        .upload-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .file-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            flex: 1;
+        }
+        
+        .file-input-label {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px dashed var(--primary);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: var(--text-muted);
+            width: 100%;
+        }
+        
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--secondary);
+        }
+        
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .question-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(44, 111, 252, 0.2);
+            display: none;
+        }
+        
+        .question-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .question-display {
+            font-size: 1.1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(44, 111, 252, 0.1);
+        }
+        
+        .question-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        footer {
+            background: var(--dark);
+            padding: 1.5rem 5%;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .heart {
+            color: #ff3366;
+            animation: beat 1s infinite alternate;
+            display: inline-block;
+        }
+        
+        @keyframes beat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+        
+        @media (max-width: 768px) {
+            .recorder-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .recorder-title {
+                font-size: 1.8rem;
+            }
+            
+            .file-upload {
+                flex-direction: column;
+            }
+            
+            .section-divider::before, 
+            .section-divider::after {
+                width: 20%;
+            }
+        }
+    </style>
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: #f4f4f4;
-        padding: 20px;
-    }
 
-    h2 {
-        color: #333;
-    }
-
-    video {
-        width: 80%;
-        max-width: 600px;
-        border: 3px solid #333;
-        border-radius: 10px;
-        margin-top: 20px;
-    }
-
-    button {
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        margin: 10px;
-        cursor: pointer;
-        font-size: 16px;
-        border-radius: 5px;
-    }
-
-    button:disabled {
-        background-color: #aaa;
-        cursor: not-allowed;
-    }
-
-    button:hover:not(:disabled) {
-        background-color: #0056b3;
-    }
-</style>
 <body>
-    <h2>Video & Audio Recorder</h2>
-    <video id="preview" autoplay></video>
-    <br>
-    <button id="start">Start Recording</button>
-    <button id="stop" disabled>Stop Recording</button>
-
+    <div class="particles-container" id="particles"></div>
+    
+    <header>
+        <a href="index.html" class="logo">Commun<span>Ai</span></a>
+    </header>
+    
+    <main class="main-container">
+        <div class="recorder-card">
+            <div class="recorder-header">
+                <h1 class="recorder-title">Video & Audio <span>Recorder</span></h1>
+                <p class="recorder-subtitle">Practice your interview skills with AI feedback</p>
+            </div>
+            
+            <video id="preview" autoplay></video>
+            
+            <div class="controls" style="text-align: center;">
+                <button id="start" class="control-btn"><i class="fas fa-video"></i> Start Recording</button>
+                <button id="stop" class="control-btn" disabled><i class="fas fa-stop-circle"></i> Stop Recording</button>
+            </div>
+            
+            <div class="section-divider">Generate Practice Questions</div>
+            
+            <div class="upload-section">
+                <h3 class="upload-title">Upload Resume PDF to Generate Questions</h3>
+                <div class="file-upload">
+                    <div class="file-input-wrapper">
+                        <label class="file-input-label">
+                            <i class="fas fa-file-pdf"></i> Select PDF File
+                            <input type="file" id="uploadPdf" accept="application/pdf" class="file-input">
+                        </label>
+                    </div>
+                    <button onclick="uploadPdf()" class="control-btn"><i class="fas fa-magic"></i> Generate Questions</button>
+                </div>
+            </div>
+            
+            <div id="questionBox" class="question-box">
+                <h3 class="question-title">Interview Questions</h3>
+                <div id="slider" class="question-display">Your question will appear here</div>
+                <div class="question-nav">
+                    <button onclick="prevQuestion()" class="control-btn"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button onclick="nextQuestion()" class="control-btn"><i class="fas fa-arrow-right"></i> Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p class="footer-text">Made with <span class="heart">❤️</span> at Hackathon</p>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        let questionList = [];
+        let currentIndex = 0;
+
+        function uploadPdf() {
+            const fileInput = document.getElementById('uploadPdf');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select a PDF file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("pdf", file);
+
+            fetch("http://localhost:5000/upload-pdf", {
+                method: "POST",
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.questions) {
+                        questionList = data.questions;
+                        currentIndex = 0;
+                        showQuestion(currentIndex);
+                        document.getElementById("questionBox").style.display = "block";
+                    } else {
+                        alert("Error: " + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Failed to upload PDF or generate questions.");
+                });
+        }
+
+        function showQuestion(index) {
+            const slider = document.getElementById("slider");
+            slider.innerText = questionList[index];
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showQuestion(currentIndex);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questionList.length - 1) {
+                currentIndex++;
+                showQuestion(currentIndex);
+            }
+        }
+        
+        // Background particles
+        let scene, camera, renderer, particles;
+        
+        function initParticles() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('particles').appendChild(renderer.domElement);
+            
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0x0cffe1,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+            
+            camera.position.z = 2;
+            
+            window.addEventListener('resize', onWindowResize, false);
+            
+            animate();
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            particles.rotation.x += 0.0001;
+            particles.rotation.y += 0.0002;
+            
+            document.addEventListener('mousemove', (event) => {
+                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                particles.rotation.x += mouseY * 0.00005;
+                particles.rotation.y += mouseX * 0.00005;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Video Recording functionality
         let mediaRecorder;
         let recordedChunks = [];
 
@@ -73,9 +530,29 @@
                     method: "POST",
                     body: formData
                 })
-                .then(response => response.text())
-                .then(data => alert("File saved successfully: " + data))
-                .catch(error => console.error("Error:", error));
+                    .then(response => response.text())
+                    .then(data => {
+                        // Show success notification
+                        const notification = document.createElement('div');
+                        notification.style.position = 'fixed';
+                        notification.style.bottom = '20px';
+                        notification.style.right = '20px';
+                        notification.style.background = 'rgba(12, 255, 225, 0.9)';
+                        notification.style.color = '#0a0a14';
+                        notification.style.padding = '10px 20px';
+                        notification.style.borderRadius = '5px';
+                        notification.style.fontWeight = 'bold';
+                        notification.style.zIndex = '9999';
+                        notification.innerHTML = '<i class="fas fa-check-circle"></i> Recording saved successfully!';
+                        document.body.appendChild(notification);
+                        
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                            notification.style.transition = 'opacity 0.5s ease';
+                            setTimeout(() => document.body.removeChild(notification), 500);
+                        }, 3000);
+                    })
+                    .catch(error => console.error("Error:", error));
             };
 
             mediaRecorder.start();
@@ -91,6 +568,12 @@
 
         document.getElementById("start").addEventListener("click", startRecording);
         document.getElementById("stop").addEventListener("click", stopRecording);
+        
+        // Initialize particles on window load
+        window.onload = function() {
+            initParticles();
+        };
     </script>
 </body>
+
 </html>
