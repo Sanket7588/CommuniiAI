@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video & Audio Recorder</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f4f4f4;
+        padding: 20px;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    video {
+        width: 80%;
+        max-width: 600px;
+        border: 3px solid #333;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    button {
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+    button:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+</style>
+<body>
+    <h2>Video & Audio Recorder</h2>
+    <video id="preview" autoplay></video>
+    <br>
+    <button id="start">Start Recording</button>
+    <button id="stop" disabled>Stop Recording</button>
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        async function startRecording() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById("preview").srcObject = stream;
+
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
+
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(recordedChunks, { type: "video/mp4" });
+                const formData = new FormData();
+                formData.append("video", blob, "recording.mp4");
+
+                // Send to the Node.js server
+                fetch("http://localhost:3000/upload", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => alert("File saved successfully: " + data))
+                .catch(error => console.error("Error:", error));
+            };
+
+            mediaRecorder.start();
+            document.getElementById("start").disabled = true;
+            document.getElementById("stop").disabled = false;
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById("stop").disabled = true;
+            document.getElementById("start").disabled = false;
+        }
+
+        document.getElementById("start").addEventListener("click", startRecording);
+        document.getElementById("stop").addEventListener("click", stopRecording);
+    </script>
+</body>
+</html>

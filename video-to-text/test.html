@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio File Transcription</title>
+</head>
+<body>
+
+    <h2>Upload an Audio File & Transcribe</h2>
+    <input type="file" id="audioFile" accept="audio/*">
+    <button onclick="playAudio()">▶ Play & Transcribe</button>
+
+    <audio id="audioPlayer" controls></audio>
+    <p><strong>Transcription:</strong></p>
+    <textarea id="transcription" rows="5" cols="50" readonly></textarea>
+
+    <script>
+        let recognition;
+
+
+        function initializeSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Your browser does not support Speech Recognition.");
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = "en-US";
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onresult = function (event) {
+                let transcript = "";
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript + " ";
+                }
+                document.getElementById("transcription").value = transcript.trim();
+            };
+
+            recognition.onerror = function (event) {
+                console.error("Speech Recognition Error:", event.error);
+            };
+        }
+
+        function playAudio() {
+            const fileInput = document.getElementById("audioFile");
+            const audioPlayer = document.getElementById("audioPlayer");
+
+            if (fileInput.files.length === 0) {
+                alert("Please upload an audio file first.");
+                return;
+            }
+
+            // Get the file and set it as the source
+            const file = fileInput.files[0];
+            const objectURL = URL.createObjectURL(file);
+            audioPlayer.src = objectURL;
+            audioPlayer.play();
+
+            // Start transcription
+            if (recognition) {
+                recognition.start();
+            }
+        }
+
+        initializeSpeechRecognition();
+    </script>
+
+</body>
+</html>
