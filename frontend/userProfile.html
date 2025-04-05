@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - CommunAi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0cffe1;
+            --secondary: #2c6ffc;
+            --dark: #0a0a14;
+            --darker: #050508;
+            --text: #e0e0f0;
+            --text-muted: #a8a8c0;
+            --glow: rgba(12, 255, 225, 0.6);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            background: rgba(5, 5, 8, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            text-shadow: 0 0 10px var(--glow);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--text);
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: var(--primary);
+            color: var(--darker);
+            box-shadow: 0 0 10px var(--glow);
+        }
+        
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 2rem;
+            margin-top: 100px;
+            max-width: 1200px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: rgba(10, 10, 20, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(44, 111, 252, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .profile-avatar {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 15px var(--glow);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .edit-avatar {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: var(--darker);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-name span {
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .user-email {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .user-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stat-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .main-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .main-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(10, 10, 20, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(44, 111, 252, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(12, 255, 225, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--darker);
+            box-shadow: 0 5px 15px rgba(12, 255, 225, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(12, 255, 225, 0.4);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-secondary {
+            background: rgba(44, 111, 252, 0.1);
+            color: var(--text);
+            border: 1px solid var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(44, 111, 252, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(44, 111, 252, 0.3);
+        }
+        
+        .friends-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        
+        .friends-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .friends-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        .friends-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .friend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+        }
+        
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+        
+        .friend-status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .status-online {
+            color: #4CAF50;
+        }
+        
+        .add-friend {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .add-friend:hover {
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .recent-sessions {
+            margin-top: 1rem;
+        }
+        
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .session-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(12, 255, 225, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-title {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+        
+        .session-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .session-score {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .progress-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .progress-ring-circle {
+            stroke: var(--primary);
+            stroke-linecap: round;
+            transition: all 1s ease;
+            filter: drop-shadow(0 0 5px var(--glow));
+        }
+        
+        .progress-ring-bg {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .progress-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 5px var(--glow);
+        }
+        
+        .progress-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        
+        .skill-item {
+            background: rgba(12, 255, 225, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-item:hover {
+            background: var(--primary);
+            color: var(--darker);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(12, 255, 225, 0.3);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        footer {
+            background: var(--dark);
+            padding: 1.5rem 5%;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .heart {
+            color: #ff3366;
+            animation: beat 1s infinite alternate;
+            display: inline-block;
+        }
+        
+        @keyframes beat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-stats {
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles-container" id="particles"></div>
+    
+    <header>
+        <a href="index.html" class="logo">Commun<span>Ai</span></a>
+        <div class="nav-links">
+            <a href="#" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link">History</a>
+            <button class="logout-btn">Log Out</button>
+        </div>
+    </header>
+    
+    <main class="profile-container">
+        <section class="profile-header">
+            <div class="profile-avatar">
+                <img src="/api/placeholder/120/120" alt="Profile Picture">
+                <div class="edit-avatar">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <h1 class="user-name">Alex <span>Johnson</span></h1>
+                <p class="user-email">alex.johnson@example.com</p>
+                
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-check stat-icon"></i>
+                        <span>Joined April 2025</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-users stat-icon"></i>
+                        <span>15 Friends</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-brain stat-icon"></i>
+                        <span>27 Practice Sessions</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="main-section">
+            <div class="left-column">
+                <section class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Overall Performance</h2>
+                    </div>
+                    
+                    <div class="performance-chart">
+                        <div class="progress-circle">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle class="progress-ring-bg" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                                <circle class="progress-ring-circle" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" stroke-dasharray="314" stroke-dashoffset="78.5"/>
+                            </svg>
+                            <div class="progress-text">
+                                <div class="progress-value">75%</div>
+                                <div class="progress-label">Overall</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-stats">
+                        <div class="stat-card">
+                            <div class="stat-value">82%</div>
+                            <div class="stat-label">Communication</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">78%</div>
+                            <div class="stat-label">Technical</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">65%</div>
+                            <div class="stat-label">Problem Solving</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">27</div>
+                            <div class="stat-label">Total Sessions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-list">
+                        <div class="skill-item">JavaScript</div>
+                        <div class="skill-item">React</div>
+                        <div class="skill-item">Python</div>
+                        <div class="skill-item">Data Structures</div>
+                        <div class="skill-item">System Design</div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-briefcase"></i>
+                            Practice Interview
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-users"></i>
+                            Session with Friends
+                        </button>
+                    </div>
+                </section>
+                
+                <section class="card recent-sessions">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Sessions</h2>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="session-info">
+                            <h3 class="session-title">Frontend Developer Interview</h3>
+                            <p class="session-date">April 3, 2025</p>
+                        </div>
+                        <div class="session-score">85%</div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="session-info">
+                            <h3 class="session-title">System Design Challenge</h3>
+                            <p class="session-date">April 1, 2025</p>
+                        </div>
+                        <div class="session-score">72%</div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="session-info">
+                            <h3 class="session-title">Algorithms Practice</h3>
+                            <p class="session-date">March 28, 2025</p>
+                        </div>
+                        <div class="session-score">68%</div>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="right-column">
+                <section class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Friends</h2>
+                    </div>
+                    
+                    <div class="friends-list">
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                <img src="/api/placeholder/50/50" alt="Friend Avatar">
+                            </div>
+                            <div class="friend-info">
+                                <h3 class="friend-name">Sarah Miller</h3>
+                                <p class="friend-status status-online">Online</p>
+                            </div>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                <img src="/api/placeholder/50/50" alt="Friend Avatar">
+                            </div>
+                            <div class="friend-info">
+                                <h3 class="friend-name">James Wilson</h3>
+                                <p class="friend-status">Last seen 2h ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                <img src="/api/placeholder/50/50" alt="Friend Avatar">
+                            </div>
+                            <div class="friend-info">
+                                <h3 class="friend-name">Emily Chen</h3>
+                                <p class="friend-status status-online">Online</p>
+                            </div>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                <img src="/api/placeholder/50/50" alt="Friend Avatar">
+                            </div>
+                            <div class="friend-info">
+                                <h3 class="friend-name">Michael Brown</h3>
+                                <p class="friend-status">Last seen 1d ago</p>
+                            </div>
+                        </div>
+                        
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                <img src="/api/placeholder/50/50" alt="Friend Avatar">
+                            </div>
+                            <div class="friend-info">
+                                <h3 class="friend-name">Jessica Lee</h3>
+                                <p class="friend-status">Last seen 5h ago</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="add-friend">
+                        <i class="fas fa-user-plus"></i>
+                        Add New Friend
+                    </button>
+                </section>
+                
+                <section class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Upcoming Tests</h2>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="session-info">
+                            <h3 class="session-title">Google Technical Round</h3>
+                            <p class="session-date">April 10, 2025</p>
+                        </div>
+                    </div>
+                    
+                    <div class="session-item">
+                        <div class="session-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="session-info">
+                            <h3 class="session-title">Amazon Behavioral</h3>
+                            <p class="session-date">April 15, 2025</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p class="footer-text">Made with <span class="heart">❤️</span> at Hackathon</p>
+    </footer>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Particles background
+        let scene, camera, renderer, particles;
+        
+        function initParticles() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('particles').appendChild(renderer.domElement);
+            
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0x0cffe1,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+            
+            camera.position.z = 2;
+            
+            window.addEventListener('resize', onWindowResize, false);
+            
+            animate();
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate particles
+            particles.rotation.x += 0.0001;
+            particles.rotation.y += 0.0002;
+            
+            // Mouse movement effect
+            document.addEventListener('mousemove', (event) => {
+                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                particles.rotation.x += mouseY * 0.00005;
+                particles.rotation.y += mouseX * 0.00005;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Initialize particles on window load
+        window.onload = function() {
+            initParticles();
+            
+            // Animate progress circle
+            const progressCircle = document.querySelector('.progress-ring-circle');
+            const radius = progressCircle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+        }
