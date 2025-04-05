@@ -1,0 +1,6 @@
+{
+    "java.project.sourcePaths": [
+        "video-to-text",
+        "backend-python/venv"
+    ]
+}
