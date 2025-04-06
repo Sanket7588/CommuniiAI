@@ -1,30 +1,78 @@
-to run the server: 
-node server.js
+# CommuniiAI
 
+![License](https://img.shields.io/github/license/Onkarsathe007/CommuniiAI)
+![Issues](https://img.shields.io/github/issues/Onkarsathe007/CommuniiAI)
+![Forks](https://img.shields.io/github/forks/Onkarsathe007/CommuniiAI)
+![Stars](https://img.shields.io/github/stars/Onkarsathe007/CommuniiAI)
 
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
---to genrate the certificate
+CommuniiAI is an AI-powered platform that transforms video content into text and provides various analytics and predictions. 
 
+## Features
 
-your ip and port:
-    https://192.168.0.seven:5000/
+- **Video-to-Text Conversion**: Convert your video content into text effortlessly.
+- **Data Analytics**: Gain insights from your video data.
+- **Predictions**: Process and analyze predictions based on video content.
 
+## Table of Contents
 
-note use in other system: 
-https://
+- [CommuniiAI](#communiiai)
+  - [Features](#features)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
 
+## Installation
 
+Follow these steps to set up the project locally:
 
+1. **Clone the repository**:
+    ```sh
+    git clone https://github.com/Onkarsathe007/CommuniiAI.git
+    cd CommuniiAI
+    ```
 
-run servers:
+2. **Create a virtual environment**:
+    ```sh
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
 
+3. **Install the dependencies**:
+    ```sh
+    pip install -r requirements.txt
+    ```
 
-cd backend-python
-python3 demo.py
+## Usage
 
-cd video-to-text
-node server.js    //to start an node server for the stroing video
+1. **Start the application**:
+    ```sh
+    python app.py
+    ```
 
-for the transcript genration from the video:
-cd video-to-text
-node transcript.js
+2. **Access the application**:
+    Open your web browser and navigate to `http://localhost:5000`.
+
+3. **Upload a video**:
+    Upload your video file and let the system process it to generate text and predictions.
+
+## Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+If you have any questions, feel free to reach out:
+
+- **GitHub Issues**: [Create an issue](https://github.com/Onkarsathe007/CommuniiAI/issues)
+- **Email**: [your-email@example.com](mailto:your-email@example.com)
+
+---
+
+Made with ❤️ by [Onkarsathe007](https://github.com/Onkarsathe007)
