@@ -6,7 +6,7 @@ const socketIo = require("socket.io");
 const { createPieChart } = require('./chartGenerator');   //to generate an chart
 
 
-const PORT = 5000;
+const PORT = 5010;
 const app = express();
 
 // 🔹 Load SSL certificate & key
@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
 
 
 // 🔹 Start the HTTPS server
-server.listen(5000, () => {
+server.listen(5010, () => {
   console.log("🚀 HTTPS server running at https://<your-local-ip>:5000");
 });
 
