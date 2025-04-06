@@ -335,6 +335,26 @@
             .section-divider::after {
                 width: 20%;
             }
+            .control-dropdown {
+                margin-bottom: 10px;
+                padding: 0.8rem 1.5rem;
+                border-radius: 8px;
+                font-family: 'Orbitron', sans-serif;
+                font-weight: 500;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin: 0.5rem;
+                position: relative;
+                overflow: hidden;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                display: inline-flex;
+                align-items: center;
+                background: var(--darker);
+                color: var(--text);
+                border: 1px solid var(--primary);
+            }
         }
     </style>
 </head>
@@ -352,10 +372,16 @@
                 <h1 class="recorder-title">Video & Audio <span>Recorder</span></h1>
                 <p class="recorder-subtitle">Practice your interview skills with AI feedback</p>
             </div>
-            
             <video id="preview" autoplay></video>
             
             <div class="controls" style="text-align: center;">
+            <select id="timer-duration" class="control-dropdown">
+                <option value="10">10 seconds</option>
+                <option value="20">20 seconds</option>
+                <option value="30">30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="120">2 minutes</option>
+            </select>
                 <button id="start" class="control-btn"><i class="fas fa-video"></i> Start Recording</button>
                 <button id="stop" class="control-btn" disabled><i class="fas fa-stop-circle"></i> Stop Recording</button>
             </div>
@@ -394,7 +420,7 @@
     <script>
         let questionList = [];
         let currentIndex = 0;
-
+        
         function uploadPdf() {
             const fileInput = document.getElementById('uploadPdf');
             const file = fileInput.files[0];
@@ -508,71 +534,84 @@
             
             renderer.render(scene, camera);
         }
-        
-        // Video Recording functionality
         let mediaRecorder;
-        let recordedChunks = [];
+let recordedChunks = [];
+let recordingTimeout;
 
-        async function startRecording() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById("preview").srcObject = stream;
+// Function to start recording with a custom timer
+async function startRecording() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById("preview").srcObject = stream;
 
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = event => recordedChunks.push(event.data);
 
-            mediaRecorder.onstop = async () => {
-                const blob = new Blob(recordedChunks, { type: "video/mp4" });
-                const formData = new FormData();
-                formData.append("video", blob, "recording.mp4");
+    mediaRecorder.onstop = async () => {
+        const blob = new Blob(recordedChunks, { type: "video/mp4" });
+        const formData = new FormData();
+        formData.append("video", blob, "recording.mp4");
 
-                // Send to the Node.js server
-                fetch("http://localhost:3000/upload", {
-                    method: "POST",
-                    body: formData
-                })
-                    .then(response => response.text())
-                    .then(data => {
-                        // Show success notification
-                        const notification = document.createElement('div');
-                        notification.style.position = 'fixed';
-                        notification.style.bottom = '20px';
-                        notification.style.right = '20px';
-                        notification.style.background = 'rgba(12, 255, 225, 0.9)';
-                        notification.style.color = '#0a0a14';
-                        notification.style.padding = '10px 20px';
-                        notification.style.borderRadius = '5px';
-                        notification.style.fontWeight = 'bold';
-                        notification.style.zIndex = '9999';
-                        notification.innerHTML = '<i class="fas fa-check-circle"></i> Recording saved successfully!';
-                        document.body.appendChild(notification);
-                        
-                        setTimeout(() => {
-                            notification.style.opacity = '0';
-                            notification.style.transition = 'opacity 0.5s ease';
-                            setTimeout(() => document.body.removeChild(notification), 500);
-                        }, 3000);
-                    })
-                    .catch(error => console.error("Error:", error));
-            };
+        // Send to the Node.js server
+        fetch("http://localhost:3000/upload", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.text())
+            .then(data => {
+                // Show success notification
+                const notification = document.createElement('div');
+                notification.style.position = 'fixed';
+                notification.style.bottom = '20px';
+                notification.style.right = '20px';
+                notification.style.background = 'rgba(12, 255, 225, 0.9)';
+                notification.style.color = '#0a0a14';
+                notification.style.padding = '10px 20px';
+                notification.style.borderRadius = '5px';
+                notification.style.fontWeight = 'bold';
+                notification.style.zIndex = '9999';
+                notification.innerHTML = '<i class="fas fa-check-circle"></i> Recording saved successfully!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => document.body.removeChild(notification), 500);
+                }, 3000);
+            })
+            .catch(error => console.error("Error:", error));
+    };
 
-            mediaRecorder.start();
-            document.getElementById("start").disabled = true;
-            document.getElementById("stop").disabled = false;
-        }
+    mediaRecorder.start();
+    document.getElementById("start").disabled = true;
+    document.getElementById("stop").disabled = false;
 
-        function stopRecording() {
-            mediaRecorder.stop();
-            document.getElementById("stop").disabled = true;
-            document.getElementById("start").disabled = false;
-        }
+    // Get the timer duration from the dropdown menu
+    const timerDuration = document.getElementById("timer-duration").value;
+    const durationInMilliseconds = timerDuration ? parseInt(timerDuration) * 1000 : 60000; // Default to 1 minute if no input
 
-        document.getElementById("start").addEventListener("click", startRecording);
-        document.getElementById("stop").addEventListener("click", stopRecording);
+    // Set a timer to stop recording after the specified duration
+    recordingTimeout = setTimeout(stopRecording, durationInMilliseconds);
+}
+
+// Function to stop recording
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+    }
+    clearTimeout(recordingTimeout);
+    document.getElementById("stop").disabled = true;
+    document.getElementById("start").disabled = false;
+}
+
+// Event listeners
+document.getElementById("start").addEventListener("click", startRecording);
+document.getElementById("stop").addEventListener("click", stopRecording);
+
+// Initialize particles on window load
+window.onload = function() {
+    initParticles();
+};
         
-        // Initialize particles on window load
-        window.onload = function() {
-            initParticles();
-        };
     </script>
 </body>
 
