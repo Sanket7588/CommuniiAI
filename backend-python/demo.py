@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 
-
-
+model = genai.GenerativeModel('gemini-1.5-flash')
 # Path to .env file in root directory
 dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.env'))
 import google.generativeai as genai
