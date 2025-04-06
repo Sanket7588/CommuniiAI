@@ -117,12 +117,15 @@
         }
         
         video {
-            width: 100%;
+            width: 70%;
+            height: 50%;
             border: 2px solid var(--primary);
             border-radius: 10px;
-            margin: 1.5rem 0;
+            margin: 1.5rem auto; /* Changed to auto for horizontal centering */
             box-shadow: 0 0 15px var(--glow);
+            display: block; /* Required for margin auto to center the element */
         }
+        
         
         .control-btn {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
@@ -335,7 +338,8 @@
             .section-divider::after {
                 width: 20%;
             }
-            .control-dropdown {
+            #control-dropdown {
+                background-color: #010308;
                 margin-bottom: 10px;
                 padding: 0.8rem 1.5rem;
                 border-radius: 8px;
@@ -375,7 +379,7 @@
             <video id="preview" autoplay></video>
             
             <div class="controls" style="text-align: center;">
-            <select id="timer-duration" class="control-dropdown">
+            <select id="timer-duration" id="control-dropdown">
                 <option value="10">10 seconds</option>
                 <option value="20">20 seconds</option>
                 <option value="30">30 seconds</option>
