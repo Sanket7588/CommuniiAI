@@ -374,6 +374,15 @@
                 color: var(--text);
                 border: 1px solid var(--primary);
             }
+            .chart-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+            .chart-container img {
+                max-width: 100%;
+                height: auto;
+            }
         }
     </style>
 </head>
@@ -430,7 +439,11 @@
             </div>
 
             <div id="transcript-container" class="questionBox">loading suggestions...</div>
-        </div>
+            <!-- <div id="transcript-container2" class="questionBox">loading suggestions...</div> //to test api response-->
+            <div id="chart-container" class="chart-container">
+                <img src="./public/static/pie-chart.png" style="width: 20rem;height:20rem" alt="">
+            </div>        
+    
     </main>
     
     <footer>
@@ -442,6 +455,26 @@
         let questionList = [];
         let currentIndex = 0;
         
+        //testing
+        const chartContainer = document.getElementById('chart-container');
+        const baseURL = '/public/static/';
+        const chartCount = 1; // Adjust this number based on the maximum number of charts you expect
+
+        for (let i = 1; i <= chartCount; i++) {
+            const imgURL = `${baseURL}pie-chart-${i}.png`;
+            fetch(imgURL)
+                .then(response => {
+                    if (response.ok) {
+                        const img = document.createElement('img');
+                        img.src = imgURL;
+                        chartContainer.appendChild(img);
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error fetching ${imgURL}:`, error);
+                });
+        }
+
         function uploadPdf() {
             const fileInput = document.getElementById('uploadPdf');
             const file = fileInput.files[0];
@@ -639,6 +672,21 @@ async function startRecording() {
         }
     })
     .catch(error => console.error("Error:", error));
+    //testing
+    fetch("http://localhost:3002/transcribe2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: "./upload/input.mp4" }) // Adjust the file path as needed
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const transcriptContainer = document.getElementById("transcript-container2");
+            transcriptContainer.innerHTML = data.transcript;
+        } else {
+            console.error("Failed to fetch transcript");
+        }
+    })
 }
 
 // Event listeners
