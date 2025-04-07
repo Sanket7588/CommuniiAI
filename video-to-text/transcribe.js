@@ -2,8 +2,14 @@ const { GoogleAIFileManager, FileState } = require("@google/generative-ai/server
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const dotenv = require("dotenv");
 const path = require("path");
+const express = require("express");
+const cors = require("cors");
 
 dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 async function transcribeAudio(fileName) {
     try {
@@ -45,16 +51,32 @@ async function transcribeAudio(fileName) {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const result = await model.generateContent([
-            { text: "Only return me the transcript of the media sample. Also, provide details of the shirt color and video information." },
+            { text: "Only return me the transcript of and give the confidace level" },
             { fileData: { fileUri: uploadResult.file.uri, mimeType } },
         ]);
 
-        console.log(await result.response.text());
+        const transcript = await result.response.text();
+        console.log(transcript); // Print the transcript to the console
+        
+        return transcript;
 
     } catch (error) {
         console.error("Error:", error.message);
+        return null;
     }
 }
 
-// Call the function
-transcribeAudio("./upload/input.mp4");
+// Endpoint to receive the video file
+app.post("/transcribe", async (req, res) => {
+    const { fileName } = req.body; // Assuming fileName is passed in the request body
+    const transcript = await transcribeAudio(fileName);
+    if (transcript) {
+        res.json({ success: true, transcript });
+    } else {
+        res.json({ success: false });
+    }
+});
+
+app.listen(3001, () => {
+    console.log("Server is running on port 3001");
+});

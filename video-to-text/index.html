@@ -277,7 +277,22 @@
             margin-bottom: 1rem;
             text-align: center;
         }
-        
+        #transcript-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(44, 111, 252, 0.2);
+            color: var(--text);
+            font-size: 1.5rem;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px var(--glow);
+        }
         .question-display {
             font-size: 1.1rem;
             padding: 1.5rem;
@@ -413,6 +428,8 @@
                     <button onclick="nextQuestion()" class="control-btn"><i class="fas fa-arrow-right"></i> Next</button>
                 </div>
             </div>
+
+            <div id="transcript-container" class="questionBox">loading suggestions...</div>
         </div>
     </main>
     
@@ -597,14 +614,31 @@ async function startRecording() {
     recordingTimeout = setTimeout(stopRecording, durationInMilliseconds);
 }
 
-// Function to stop recording
-function stopRecording() {
+ // Modify the stopRecording function
+ function stopRecording() {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
     }
     clearTimeout(recordingTimeout);
     document.getElementById("stop").disabled = true;
     document.getElementById("start").disabled = false;
+
+    // Fetch and display the transcript
+    fetch("http://localhost:3001/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: "./upload/input.mp4" }) // Adjust the file path as needed
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const transcriptContainer = document.getElementById("transcript-container");
+            transcriptContainer.innerHTML = data.transcript;
+        } else {
+            console.error("Failed to fetch transcript");
+        }
+    })
+    .catch(error => console.error("Error:", error));
 }
 
 // Event listeners

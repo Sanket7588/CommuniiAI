@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
 
 // 🔹 Start the HTTPS server
 server.listen(5010, () => {
-  console.log("🚀 HTTPS server running at https://<your-local-ip>:5000");
+  console.log("🚀 HTTPS server running at https://<your-local-ip>:5010");
 });
 
 
