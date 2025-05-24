@@ -42,7 +42,7 @@ Follow these steps to set up the project locally:
 
 3. **Install the dependencies**:
     ```sh
-    pip install -r requirements.txt
+    pip install -r requirement.txt
     ```
 
 ## Usage
@@ -74,5 +74,3 @@ If you have any questions, feel free to reach out:
 - **Email**: [your-email@example.com](mailto:your-email@example.com)
 
 ---
-
-Made with ❤️ by [Onkarsathe007](https://github.com/Onkarsathe007)
